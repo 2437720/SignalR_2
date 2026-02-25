@@ -14,37 +14,40 @@ import * as signalR from "@microsoft/signalr"
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent  {
+export class ChatComponent {
 
   message: string = "test";
   messages: string[] = [];
 
-  usersList:UserEntry[] = [];
-  channelsList:Channel[] = [];
+  usersList: UserEntry[] = [];
+  channelsList: Channel[] = [];
 
   isConnectedToHub: boolean = false;
 
   newChannelName: string = "";
 
-  selectedChannel:Channel | null = null;
-  selectedUser:UserEntry | null = null;
+  selectedChannel: Channel | null = null;
+  selectedUser: UserEntry | null = null;
 
   private hubConnection?: signalR.HubConnection
 
-  constructor(public http: HttpClient, public authentication:AuthenticationService){
+  constructor(public http: HttpClient, public authentication: AuthenticationService) {
 
   }
 
   connectToHub() {
     // On commence par créer la connexion vers le Hub
     this.hubConnection = new signalR.HubConnectionBuilder()
-                              .withUrl('http://localhost:5106/chat', { accessTokenFactory: () => localStorage.getItem("token")! })
-                              .build();
+      .withUrl('http://localhost:5106/chat', { accessTokenFactory: () => localStorage.getItem("token")! })
+      .build();
 
     // On peut commencer à écouter pour les messages que l'on va recevoir du serveur
     this.hubConnection.on('UsersList', (data) => {
       this.usersList = data;
+      console.log(this.usersList)
     });
+
+
 
     // TODO: Écouter le message pour mettre à jour la liste de channels
 
@@ -53,6 +56,10 @@ export class ChatComponent  {
     });
 
     // TODO: Écouter le message pour quitter un channel (lorsque le channel est effacé)
+    this.hubConnection.on('ChannelList', (channels) => {
+      this.channelsList.push(channels)
+      console.log(this.channelsList)
+    })
 
     // On se connecte au Hub
     this.hubConnection
@@ -74,21 +81,23 @@ export class ChatComponent  {
     this.hubConnection!.invoke('SendMessage', this.message, selectedChannelId, this.selectedUser?.value);
   }
 
-  userClick(user:UserEntry) {
-    if(user == this.selectedUser){
+  userClick(user: UserEntry) {
+    if (user == this.selectedUser) {
       this.selectedUser = null;
     }
   }
 
-  createChannel(){
+  createChannel() {
+    // TODO: Ajouter un invoke
+    this.hubConnection!.invoke('CreateChannel', this.newChannelName);
+
+  }
+
+  deleteChannel(channel: Channel) {
     // TODO: Ajouter un invoke
   }
 
-  deleteChannel(channel: Channel){
-    // TODO: Ajouter un invoke
-  }
-
-  leaveChannel(){
+  leaveChannel() {
     let selectedChannelId = this.selectedChannel ? this.selectedChannel.id : 0;
     this.hubConnection!.invoke('JoinChannel', selectedChannelId, 0);
     this.selectedChannel = null;
