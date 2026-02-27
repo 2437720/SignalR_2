@@ -238,7 +238,7 @@ namespace signalr.backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Channel");
+                    b.ToTable("Channel", (string)null);
 
                     b.HasData(
                         new

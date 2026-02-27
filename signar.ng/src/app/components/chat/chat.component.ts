@@ -57,7 +57,7 @@ export class ChatComponent {
 
     // TODO: Écouter le message pour quitter un channel (lorsque le channel est effacé)
     this.hubConnection.on('ChannelList', (channels) => {
-      this.channelsList.push(channels)
+      this.channelsList = channels;
       console.log(this.channelsList)
     })
 
@@ -95,6 +95,7 @@ export class ChatComponent {
 
   deleteChannel(channel: Channel) {
     // TODO: Ajouter un invoke
+    this.hubConnection!.invoke('DeleteChannel', channel.id);
   }
 
   leaveChannel() {
