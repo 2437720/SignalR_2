@@ -79,6 +79,8 @@ export class ChatComponent {
   sendMessage() {
     let selectedChannelId = this.selectedChannel ? this.selectedChannel.id : 0;
     this.hubConnection!.invoke('SendMessage', this.message, selectedChannelId, this.selectedUser?.value);
+    console.log("Ca marche")
+
   }
 
   userClick(user: UserEntry) {

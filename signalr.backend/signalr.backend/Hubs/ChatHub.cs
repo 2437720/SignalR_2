@@ -90,20 +90,47 @@ namespace signalr.backend.Hubs
             string userTag = "[" + CurentUser.Email! + "]";
 
             // TODO: Faire quitter le vieux canal à l'utilisateur
+            if (oldChannelId > 0)
+            {
+                string oldGroupName = CreateChannelGroupName(oldChannelId);
+                Channel channel = _context.Channel.Find(oldChannelId);
+                string message = userTag + " quitte: " + channel.Title;
+                await Clients.Group(oldGroupName).SendAsync("NewMessage", message);
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, oldGroupName);
+            }
 
 
             // TODO: Faire joindre le nouveau canal à l'utilisateur
+            if (newChannelId > 0)
+            {
+                string newGroupName = CreateChannelGroupName(newChannelId);
+                await Groups.AddToGroupAsync(Context.ConnectionId, newGroupName);
+
+                Channel channel = _context.Channel.Find(newChannelId);
+                string message = userTag + " a rejoint : " + channel.Title;
+                await Clients.Group(newGroupName).SendAsync("NewMessage", message);
+            }
+
+
         }
 
         public async Task SendMessage(string message, int channelId, string userId)
         {
             if (userId != null)
             {
+
                 // TODO: Envoyer le message à cet utilisateur
+
+                await Clients.User(userId).SendAsync("NewMessage", $"[De :{CurentUser.Email!}] " + message);
             }
             else if (channelId != 0)
             {
                 // TODO: Envoyer le message aux utilisateurs connectés à ce canal
+                string groupName = CreateChannelGroupName(channelId);
+                Channel channel = _context.Channel.Find(channelId);
+                await Clients.Group(groupName).SendAsync("NewMessage",$"[{channel.Title}] " + message);
+
+
             }
             else
             {
