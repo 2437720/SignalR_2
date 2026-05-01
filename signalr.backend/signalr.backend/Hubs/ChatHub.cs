@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using signalr.backend.Data;
 using signalr.backend.Models;
+using signalr.backend.Services;
 
 namespace signalr.backend.Hubs
 {
@@ -21,6 +22,7 @@ namespace signalr.backend.Hubs
     {
         public ApplicationDbContext _context;
 
+        private MessageBackGroundService _messageService;
 
         public IdentityUser CurentUser
         {
@@ -36,9 +38,10 @@ namespace signalr.backend.Hubs
 
         }
 
-        public ChatHub(ApplicationDbContext context)
+        public ChatHub(ApplicationDbContext context, MessageBackGroundService messageService)
         {
             _context = context;
+            _messageService = messageService;
         }
 
         public async override Task OnConnectedAsync()

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using signalr.backend.Data;
 using signalr.backend.Hubs;
+using signalr.backend.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -75,6 +76,12 @@ builder.Services.AddAuthentication(options =>
 
 // TODO Ajouter SignalR
 builder.Services.AddSignalR();
+
+
+// Background service qui va périodiquement calculer le channel le plus populaire et envoyer l'information à tous les clients connectés
+
+builder.Services.AddSingleton<MessageBackGroundService>();
+builder.Services.AddHostedService<MessageBackGroundService>(p => p.GetService<MessageBackGroundService>());
 
 var app = builder.Build();
 
