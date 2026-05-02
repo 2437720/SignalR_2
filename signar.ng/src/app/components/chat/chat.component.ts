@@ -27,12 +27,16 @@ export class ChatComponent  {
   usersList:UserEntry[] = [];
   channelsList:Channel[] = [];
 
+  
+  nbMessages = 0;
   isConnected: boolean = false;
 
   newChannelName: string = "";
 
   selectedChannel:Channel | null = null;
   selectedUser:UserEntry | null = null;
+
+
 
   private hubConnection?: signalR.HubConnection
 
@@ -49,6 +53,11 @@ export class ChatComponent  {
     // On peut commencer à écouter pour les messages que l'on va recevoir du serveur
     this.hubConnection.on('UsersList', (data) => {
       this.usersList = data;
+    });
+
+    this.hubConnection.on('NbMessages', (data) => {
+      this.nbMessages = data;
+      alert("Vous êtes au canal le plus populaire avec " + this.nbMessages + " messages !");
     });
 
     this.hubConnection.on('ChannelsList', (data) => {
